@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jupiter Swap — Redesign | Open Design Bounty</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#12161f; --panel2:#171c27; --line:#232a38;
+    --txt:#e8ecf4; --mut:#8b93a7; --grn:#2dd4a7; --org:#f7a23b; --red:#f0616d;
+    --blu:#5b8cff; --acc:#c8f24c;
+    font-size:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  section{padding:64px 0}
+  h1{font-size:2.4rem;font-weight:800;letter-spacing:-.02em}
+  h2{font-size:1.6rem;font-weight:700;letter-spacing:-.01em;margin-bottom:8px}
+  h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+  .kicker{color:var(--acc);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+  .sub{color:var(--mut);max-width:640px}
+  .hero{padding:88px 0 56px;background:
+    radial-gradient(600px 300px at 80% 0%, rgba(91,140,255,.12), transparent),
+    radial-gradient(500px 260px at 10% 100%, rgba(200,242,76,.07), transparent)}
+  .hero .meta{display:flex;gap:24px;margin-top:24px;color:var(--mut);font-size:.85rem;flex-wrap:wrap}
+  .tag{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.78rem;color:var(--mut)}
+  /* before/after grid */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+  @media(max-width:860px){.ba{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .card .lbl{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+  .lbl.before{color:var(--red)} .lbl.after{color:var(--grn)}
+  .note{color:var(--mut);font-size:.86rem;margin-top:14px}
+  .note b{color:var(--txt)}
+  /* mock chrome */
+  .phone{width:340px;margin:0 auto;border:1px solid var(--line);border-radius:28px;padding:14px;background:#0d1119}
+  .phone .bar{width:90px;height:5px;border-radius:99px;background:#2a3140;margin:0 auto 12px}
+  /* BEFORE mock: current Jupiter-ish swap card */
+  .mock{background:#161b26;border-radius:14px;padding:14px;font-size:.82rem}
+  .mock .mrow{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:.7rem;margin:2px 8px}
+  .swapbox{background:#0d1119;border:1px solid #2a3140;border-radius:12px;padding:12px;margin-bottom:4px}
+  .swapbox .cur{font-size:.68rem;color:var(--mut)}
+  .swapbox .amt{font-size:1.4rem;font-weight:700;margin:2px 0}
+  .swapbox .sel{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  .pill{background:#1c2331;border:1px solid #2a3140;border-radius:8px;padding:4px 8px;font-size:.75rem;display:inline-flex;gap:6px;align-items:center}
+  .dot{width:16px;height:16px;border-radius:50%;display:inline-block}
+  .sol{background:linear-gradient(135deg,#00ffa3,#dc1fff)}
+  .usdc{background:#2775ca}
+  .swbtn{width:32px;height:32px;border-radius:10px;background:#1c2331;border:1px solid #2a3140;display:flex;align-items:center;justify-content:center;margin:-6px auto;color:var(--mut);position:relative;z-index:2}
+  .cta{margin-top:14px;background:#3b4252;color:#aab2c5;border-radius:12px;text-align:center;padding:13px;font-weight:700}
+  .tiny{font-size:.66rem;color:var(--mut)}
+  .gasline{display:flex;gap:10px;margin-top:10px;color:var(--mut);font-size:.68rem}
+  /* AFTER mock */
+  .aftermock .swapbox{border:1px solid rgba(45,212,167,.35)}
+  .impactbar{height:6px;border-radius:99px;background:#2a3140;overflow:hidden;margin-top:8px}
+  .impactbar i{display:block;height:100%;width:12%;background:var(--grn)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .split .mini{background:#0d1119;border:1px solid #2a3140;border-radius:10px;padding:8px;font-size:.68rem;color:var(--mut)}
+  .mini b{color:var(--txt);font-size:.78rem;display:block}
+  .locked{margin-top:10px;background:rgba(200,242,76,.08);border:1px solid rgba(200,242,76,.35);border-radius:10px;padding:9px 11px;font-size:.72rem}
+  .locked b{color:var(--acc)}
+  .ctanew{margin-top:14px;background:var(--grn);color:#06281e;border-radius:12px;text-align:center;padding:13px;font-weight:800}
+  .ctanew .tiny{color:#06281e;opacity:.75;font-weight:600}
+  /* decision list */
+  .dec{display:grid;gap:14px;margin-top:28px}
+  .dec .item{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:12px;padding:16px 18px}
+  .dec .item p{color:var(--mut);font-size:.9rem;margin-top:4px}
+  /* write-up */
+  .prose{max-width:760px}
+  .prose p{color:#c3cadd;margin:14px 0}
+  .prose b{color:var(--txt)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .pain{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .pain .n{color:var(--red);font-weight:800;font-size:.8rem;letter-spacing:.1em}
+  .pain h3{margin-top:6px}
+  .pain p{color:var(--mut);font-size:.9rem;margin-top:4px}
+  footer{border-top:1px solid var(--line);color:var(--mut);font-size:.8rem;padding:28px 0;text-align:center}
+  a{color:var(--blu)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Open Design Bounty — Superteam India</div>
+    <h1>Jupiter Swap, minus the guesswork</h1>
+    <p class="sub" style="margin-top:14px">A redesign of the Jupiter swap interaction — the single most-used flow on Solana — focused on one problem: the current card makes you <i>decode</i> the trade before you can trust it.</p>
+    <div class="meta">
+      <span class="tag">App: jup.ag (Swap)</span>
+      <span class="tag">Features: swap card · slippage/impact · route preview · confirmation CTA</span>
+      <span class="tag">Desktop + Mobile</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Before / After — desktop</h2>
+    <p class="sub">Same trade (0.5 SOL → USDC), same moment. Left is how it reads today; right is the redesign.</p>
+    <div class="ba" style="margin-top:28px">
+      <div class="card">
+        <div class="lbl before">Before — current Jupiter swap card</div>
+        <div class="mock">
+          <div class="swapbox">
+            <div class="cur">You're paying</div>
+            <div class="amt">0.5</div>
+            <div class="sel"><span class="pill"><span class="dot sol"></span>SOL</span><span class="tiny">≈ $84.12 · Balance 2.31</span></div>
+          </div>
+          <div class="swbtn">↓</div>
+          <div class="swapbox">
+            <div class="cur">You're receiving (estimated)</div>
+            <div class="amt">83.47</div>
+            <div class="sel"><span class="pill"><span class="dot usdc"></span>USDC</span><span class="tiny">Balance 0</span></div>
+          </div>
+          <div class="gasline"><span>Price impact 0.12%</span><span>·</span><span>Fees $0.09</span><span>·</span><span>Route: 2 hops</span><span>·</span><span>Min. received 82.98</span></div>
+          <div class="cta">Swap</div>
+          <div class="tiny" style="text-align:center;margin-top:8px">Slippage: Auto 0.1% ⚙ &nbsp;·&nbsp; priority fee: Auto ⚙</div>
+        </div>
+        <p class="note"><b>What's wrong:</b> six different numbers with equal visual weight. Price impact, fees, min-received and route are all squeezed into one tiny line — the four things that decide whether this trade is safe. "Auto 0.1%" slippage is a settings item, not a safety confirmation.</p>
+      </div>
+      <div class="card">
+        <div class="lbl after">After — redesigned</div>
+        <div class="mock aftermock">
+          <div class="swapbox">
+            <div class="cur">You pay</div>
+            <div class="amt">0.5 <span style="font-size:.85rem;color:var(--mut)">SOL</span></div>
+            <div class="sel"><span class="pill"><span class="dot sol"></span>SOL</span><span class="tiny">$84.12</span></div>
+          </div>
+          <div class="swbtn">↓</div>
+          <div class="swapbox">
+            <div class="cur">You get — <b style="color:var(--txt)">at least 82.98 USDC</b></div>
+            <div class="amt">83.47 <span style="font-size:.85rem;color:var(--mut)">USDC</span></div>
+            <div class="pill" style="margin-top:8px"><span class="dot usdc"></span>USDC</div>
+            <div class="impactbar" title="price impact"><i></i></div>
+            <div class="tiny" style="margin-top:5px">Price impact <b style="color:var(--grn)">0.12% — negligible</b></div>
+          </div>
+          <div class="split">
+            <div class="mini"><b>1 fee, $0.09</b>all-in, no line items</div>
+            <div class="mini"><b>Direct route</b>Orca → USDC, 1 hop</div>
+          </div>
+          <div class="locked">✓ Worst case locked: <b>82.98 USDC</b> even if the market moves. Slippage 0.1% auto.</div>
+          <div class="ctanew">Swap 0.5 SOL → ~83.47 USDC<div class="tiny">guaranteed minimum 82.98</div></div>
+        </div>
+        <p class="note"><b>What changed:</b> one hero number (the guaranteed minimum), impact as a colored gauge not a decimal, fees collapsed to a single all-in figure, route stated in words. The CTA itself now repeats the trade — the last thing you read before committing is the trade, not the word "Swap".</p>
+      </div>
+    </div>
+
+    <div class="dec">
+      <div class="item"><h3>1 · Lead with the guaranteed minimum, not the estimate</h3><p>Today the big number is an estimate and the protection ("min. received") is 6px footnote text. Inverted: the minimum is the only number the protocol actually honors, so it moves into the headline — "You get — at least 82.98 USDC". The estimate stays, visually secondary. A newcomer can't be MEV'd or slip-spiked without seeing the worst case.</p></div>
+      <div class="item"><h3>2 · Price impact as a gauge with a verdict</h3><p>"0.12%" requires knowing what a good number is. A small green-to-red bar plus a plain-word verdict ("negligible / moderate / high") communicates safety at a glance, and turns red attractively early when a thin pool would eat the trade.</p></div>
+      <div class="item"><h3>3 · One fee, in dollars</h3><p>Platform fee + LP fee + network fee + priority fee as separate micro-numbers is accountant UX. Traders care about one thing: total cost. Collapsed to "$0.09 all-in", with an expandable line-item view on tap for power users.</p></div>
+      <div class="item"><h3>4 · Route in words, not just a diagram</h3><p>"2 hops" is meaningless to a newcomer. "Direct route · Orca → USDC, 1 hop" names the venues. The interactive route diagram stays one tap away, but the default answer to "where is my money going" is plain English.</p></div>
+      <div class="item"><h3>5 · The CTA is the trade</h3><p>"Swap" could send anything. "Swap 0.5 SOL → ~83.47 USDC" makes the button the final confirmation of the exact trade — a free, zero-friction guard against reviewing the wrong numbers, and it carries the guaranteed minimum in its second line.</p></div>
+      <div class="item"><h3>6 · Slippage demoted to a locked outcome</h3><p>Slippage settings are an expert control; the thing a normal user needs is the outcome: "worst case locked". The redesign shows the locked floor in the green strip and keeps the slippage gear as an advanced affordance, not a co-equal row.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--panel)">
+  <div class="wrap">
+    <h2>Mobile variation</h2>
+    <p class="sub">Same hierarchy, thumb-optimized: the guaranteed minimum is the tallest text on screen and the CTA is full-width with the trade echoed inside it.</p>
+    <div class="ba" style="margin-top:28px">
+      <div class="card">
+        <div class="lbl before">Before — mobile</div>
+        <div class="phone"><div class="bar"></div>
+          <div class="mock">
+            <div class="swapbox"><div class="cur">You're paying</div><div class="amt">0.5</div><div class="sel"><span class="pill"><span class="dot sol"></span>SOL</span></div></div>
+            <div class="swbtn">↓</div>
+            <div class="swapbox"><div class="cur">You're receiving (estimated)</div><div class="amt">83.47</div><div class="sel"><span class="pill"><span class="dot usdc"></span>USDC</span></div></div>
+            <div class="tiny" style="margin-top:8px">Price impact 0.12% · Fees $0.09 · Route: 2 hops · Min. received 82.98 · Slippage Auto 0.1% ⚙ · priority fee Auto ⚙</div>
+            <div class="cta">Swap</div>
+          </div>
+        </div>
+        <p class="note">On a 390px screen the safety info wraps into a 3-line gray paragraph — statistically invisible.</p>
+      </div>
+      <div class="card">
+        <div class="lbl after">After — mobile</div>
+        <div class="phone"><div class="bar"></div>
+          <div class="mock aftermock">
+            <div class="swapbox"><div class="cur">You pay</div><div class="amt">0.5 <span style="font-size:.85rem;color:var(--mut)">SOL</span></div><div class="sel"><span class="pill"><span class="dot sol"></span>SOL</span><span class="tiny">$84.12</span></div></div>
+            <div class="swbtn">↓</div>
+            <div class="swapbox"><div class="cur">You get — <b style="color:var(--txt)">at least 82.98 USDC</b></div><div class="amt">83.47 <span style="font-size:.85rem;color:var(--mut)">USDC</span></div><div class="impactbar"><i></i></div><div class="tiny" style="margin-top:5px">Impact <b style="color:var(--grn)">negligible</b> · $0.09 all-in · direct route</div></div>
+            <div class="locked">✓ Worst case locked: <b>82.98 USDC</b></div>
+            <div class="ctanew">Swap → ~83.47 USDC<div class="tiny">min guaranteed 82.98</div></div>
+          </div>
+        </div>
+        <p class="note">One glance answers: how much, worst case, cost. Everything else is one tap away, not one squint away.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>Write-up: the problem and the bet</h2>
+    <div class="grid2">
+      <div class="pain"><div class="n">PAIN 01</div><h3>Equal weight for unequal facts</h3><p>Price impact, fees, route and minimum-received share one 11px gray line. The numbers that protect the user have the same visual rank as the ones that describe it. New users either ignore all of them or trust all of them.</p></div>
+      <div class="pain"><div class="n">PAIN 02</div><h3>The estimate is the hero</h3><p>The biggest number on screen is the one number the protocol does not guarantee. When a trade settles at 82.60 instead of 83.47, it feels like the app lied — because the app put the promise in the footnote.</p></div>
+      <div class="pain"><div class="n">PAIN 03</div><h3>Settings pose as safety</h3><p>"Auto 0.1%" slippage sits at the bottom like a seatbelt, but it's a preference. Users believe they're protected because a setting exists; nobody checks whether 0.1% suits a volatile pair.</p></div>
+      <div class="pain"><div class="n">PAIN 04</div><h3>Generic confirmation</h3><p>The button says "Swap" regardless of the trade above it. Any mismatch between what you reviewed and what executes passes unnoticed at the exact moment of commitment.</p></div>
+    </div>
+    <p style="margin-top:24px"><b>The bet:</b> a swap card that reads like a receipt — "you pay X, you get at least Y, it costs Z, here's where it goes" — is simultaneously safer for newcomers and faster for experts. Every change above removes a decoding step, not a feature: the route diagram, fee breakdown and slippage tuning all remain one tap away. Jupiter's aggregation engine is the best in the ecosystem; this redesign just lets the interface speak its guarantees as clearly as the engine delivers them.</p>
+    <p><b>What I'd test next:</b> whether the echoed-trade CTA reduces mis-signed swaps in practice (measurable via reversal rate), and whether the plain-word impact verdict ("negligible") increases completion on volatile pairs without increasing support tickets.</p>
+  </div>
+</section>
+
+<footer>
+  Submission for “Redesign Your Favourite App on Solana” — Superteam India Open Design Bounty · Jupiter Swap: swap card, slippage/impact, route preview, confirmation CTA · Desktop + mobile
+</footer>
+
+</body>
+</html>
